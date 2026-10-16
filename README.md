@@ -30,9 +30,9 @@ Serves on `http://localhost:5173` and calls the API at `http://localhost:5287/ap
 
 ## Arch Linux note
 
-If `dotnet` tooling misbehaves after installing `dotnet-sdk` via `pacman`, reinstall it through the AUR instead:
-
 ```
-sudo pacman -R dotnet-sdk
-yay -S dotnet-sdk
+Arch's `dotnet-sdk` package is built from source and ships without the prune package data,
+which causes a build error. The `.csproj` sets `AllowMissingPrunePackageData=true` to work
+around this; it has no effect on other systems. Alternatively, install Microsoft's build
+from the AUR with `yay -S dotnet-sdk-bin`.
 ```
