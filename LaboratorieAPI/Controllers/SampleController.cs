@@ -38,10 +38,11 @@ namespace LaboratorieAPI.Controllers
         [HttpPost]
         public ActionResult<Sample> Create([FromBody] Sample item)
         {
-            if (item == null || string.IsNullOrWhiteSpace(item.Name) || item.Tempreture < -80)
+            if (item == null || string.IsNullOrWhiteSpace(item.Name) || item.Temperature < -80)
                 return BadRequest();
 
-            var created = _repository.Add(item);
+            var newSample = new Sample(0, item.Name, DateTime.UtcNow, item.Temperature);
+            var created = _repository.Add(newSample);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
     }

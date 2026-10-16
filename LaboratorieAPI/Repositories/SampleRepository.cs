@@ -5,6 +5,7 @@ namespace LaboratorieAPI.Repositories;
 
 public class SampleRepository : ISampleRepository
 {
+    private readonly object _lock = new();
     private readonly List<Sample> _items = new List<Sample>()
     {
        new Sample(1, "yeast", DateTime.UtcNow , 90),
@@ -29,8 +30,11 @@ public class SampleRepository : ISampleRepository
 
     public Sample Add(Sample item)
     {
-        item.Id = _nextId++;
-        _items.Add(item);
-        return item;
+        lock (_lock)
+        {
+            item.Id = _nextId++;
+            _items.Add(item);
+            return item;
+        }
     }
 }

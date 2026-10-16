@@ -5,7 +5,8 @@ const API_URL = 'http://localhost:5287/api/Sample'
 
 const samples = ref([])
 const name = ref('')
-const tempreture = ref(0)
+const temperature = ref(0)
+const errorMessage = ref('')
 
 async function fetchSamples() {
   const res = await fetch(API_URL)
@@ -13,13 +14,18 @@ async function fetchSamples() {
 }
 
 async function createSample() {
-  await fetch(API_URL, {
+  errorMessage.value = ''
+  const res = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name: name.value, tempreture: Number(tempreture.value) })
+    body: JSON.stringify({ name: name.value, temperature: Number(temperature.value) })
   })
+  if (!res.ok) {
+    errorMessage.value = 'Could not add sample. Check the values and try again.'
+    return
+  }
   name.value = ''
-  tempreture.value = 0
+  temperature.value = 0
   await fetchSamples()
 }
 
@@ -41,20 +47,21 @@ onMounted(fetchSamples)
       <li v-for="sample in samples" :key="sample.id">
         <span class="id">#{{ sample.id }}</span>
         <span class="name">{{ sample.name }}</span>
-        <span class="temp">{{ sample.tempreture }}°C</span>
+        <span class="temp">{{ sample.temperature }}°C</span>
         <span class="time">{{ formatTime(sample.timeStamp) }}</span>
       </li>
     </ul>
 
     <h2>Add Sample</h2>
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     <form @submit.prevent="createSample">
       <div class="field">
         <label for="name">Name</label>
         <input id="name" v-model="name" type="text" placeholder="e.g. Sample A" required />
       </div>
       <div class="field">
-        <label for="tempreture">Temperature (°C)</label>
-        <input id="tempreture" v-model="tempreture" type="number" placeholder="0.0" step="any" required />
+        <label for="temperature">Temperature (°C)</label>
+        <input id="temperature" v-model="temperature" type="number" placeholder="0.0" step="any" required />
       </div>
       <button type="submit">Add</button>
     </form>
@@ -79,6 +86,12 @@ h2 {
   font-size: 1.1rem;
   margin-top: 2rem;
   margin-bottom: 0.75rem;
+}
+
+.error {
+  color: #b91c1c;
+  font-size: 0.85rem;
+  margin: 0.5rem 0 0;
 }
 
 .sample-list {
